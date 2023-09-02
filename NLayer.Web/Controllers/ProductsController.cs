@@ -22,7 +22,8 @@ namespace NLayer.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _service.GetProductWithCategory());
+            var customResponse = await _service.GetProductWithCategory();
+            return View(customResponse.Data);
         }
         
         public async Task<IActionResult> Save()
@@ -39,6 +40,7 @@ namespace NLayer.Web.Controllers
             if(ModelState.IsValid)
             {
                 await _service.AddAsync(_mapper.Map<Product>(productDto));
+                return RedirectToAction(nameof(Index));
             }
 
             var categories = await _categoryService.GetAllAsync();
@@ -48,5 +50,51 @@ namespace NLayer.Web.Controllers
             
             return View();
         }
+        [ServiceFilter(typeof(NotFountFilter<Product>))]
+        public async Task<IActionResult> Update(int id)
+        {
+            var product = await _service.GetByIdAsync(id);
+
+
+            var categories = await _categoryService.GetAllAsync();
+
+            var categoryiesDto = _mapper.Map<List<CategoryDto>>(categories.ToList());
+
+            ViewBag.categories = new SelectList(categoryiesDto, "Id", "Name", product.CategoryId);
+
+            return View(_mapper.Map<ProductDto>(product));
+
+        }
+        [HttpPost]
+        public async Task<IActionResult> Update(ProductDto productDto)
+        {
+            if (ModelState.IsValid)
+            {
+
+                await _service.UpdateAsync(_mapper.Map<Product>(productDto));
+                return RedirectToAction(nameof(Index));
+
+            }
+
+            var categories = await _categoryService.GetAllAsync();
+
+            var categoryiesDto = _mapper.Map<List<CategoryDto>>(categories.ToList());
+
+            ViewBag.categories = new SelectList(categoryiesDto, "Id", "Name", productDto.CategoryId);
+
+            return View(productDto);
+
+        }
+        public async Task<IActionResult> Delete(int id)
+        {
+            var product = await _service.GetByIdAsync(id);
+
+
+            await _service.RemoveAsync(product);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
     }
 }

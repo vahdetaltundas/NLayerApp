@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using NLayer.Repository;
 using System.Reflection;
 using NLayer.Service.Mapping;
+using NLayer.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,7 @@ builder.Services.AddDbContext<AppDbContext>(x =>
     });
 });
 
-
+builder.Services.AddScoped(typeof(NotFountFilter<>));
 builder.Host.UseServiceProviderFactory
     (new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>
