@@ -28,5 +28,7 @@ namespace NLayer.Service.Services
             var productDto=_mapper.Map<List<ProductWithCategoryDto>>(products);
             return CustomResponseDto<List<ProductWithCategoryDto>>.Success(200,productDto);
         }
+
+
     }
 }
